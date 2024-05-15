@@ -3,6 +3,9 @@
 from pathlib import Path
 import sqlite3
 
+from menu import Menu, Page, bold
+from inputs import decimal, text
+
 
 class Database:
     def __init__(self, file: Path) -> None:
@@ -32,8 +35,10 @@ class Database:
         self.connection.commit()
 
 
+print("Loading database file...")
 database = Database(Path("coffee_shop.db"))
 
+print("Ensuring database is ready...")
 database.create_table_if_not_exists(
     "Product",
     """
@@ -46,5 +51,28 @@ database.create_table_if_not_exists(
     """,
 )
 
-# database.insert_product("Espresso", 1.5)
-# print("Added Espresso")
+
+def add_product():
+    name = text("Product name: ").capitalize()
+    price = decimal("Price: £")
+    database.insert_product(name, price)
+    print()
+    print(f"Added product {bold(name)} with price {bold(f'£{price:.2f}')}")
+
+
+def show_main_menu():
+    main_menu = Menu(
+        [
+            Page(
+                "Add product",
+                add_product,
+            )
+        ],
+        title="Coffee shop management system",
+    )
+
+    main_menu.show(loop=True)
+
+
+if __name__ == "__main__":
+    show_main_menu()
