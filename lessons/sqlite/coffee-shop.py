@@ -3,8 +3,10 @@
 from pathlib import Path
 import sqlite3
 
-from menu import Menu, Page, bold
-from inputs import decimal, text
+from colorama import Style
+
+from menu import Menu, Page, bold, color
+from inputs import decimal, integer, integer_range, text
 
 
 class Database:
@@ -60,13 +62,34 @@ def add_product():
     print(f"Added product {bold(name)} with price {bold(f'£{price:.2f}')}")
 
 
+def format_product_data(product_data):
+    id, name, price = product_data
+    return f"{color(f'{id:04}', Style.DIM)} {name} - £{price:.2f}"
+
+
+def list_products():
+    products = database.cursor.execute("SELECT * FROM Product").fetchall()
+    for product_data in products:
+        print(format_product_data(product_data))
+
+
+def delete_product():
+    selected_id = integer("Product ID to delete: ")
+
+    print()
+
+
 def show_main_menu():
     main_menu = Menu(
         [
             Page(
                 "Add product",
                 add_product,
-            )
+            ),
+            Page(
+                "List products",
+                list_products,
+            ),
         ],
         title="Coffee shop management system",
     )
